@@ -312,14 +312,21 @@ function loadScores() {
   if (gsUrl) {
     const cb = 'cb_' + Date.now();
     const s  = document.createElement('script');
-    const t  = setTimeout(() => { cleanup(); updateGsDot('err'); processScores([]); }, 8000);
+    const t  = setTimeout(() => { cleanup(); updateGsDot('err'); fallbackLocal(); }, 8000);
     function cleanup() { clearTimeout(t); delete window[cb]; if(s.parentNode) s.parentNode.removeChild(s); }
     window[cb] = function(data) {
       cleanup();
       if (data && data.status === 'ok' && Array.isArray(data.scores)) {
-        processScores(data.scores);
+        // Merge GS scores with any local scores not yet synced
+        const local = JSON.parse(store.get('ks3_y8_scores') || '[]');
+        const merged = [...data.scores];
+        local.forEach(e => {
+          if (!merged.some(s => s.name===e.name && s.date===e.date && s.game===e.game))
+            merged.push(e);
+        });
+        processScores(merged);
         updateGsDot('ok');
-      } else { processScores([]); }
+      } else { fallbackLocal(); }
     };
     s.onerror = () => { cleanup(); updateGsDot('err'); fallbackLocal(); };
     s.src = gsUrl + '?action=getScores&year=Y8&callback=' + cb + '&t=' + Date.now();
