@@ -597,7 +597,7 @@ function shuffle(arr) {
 // THEME & FILTER
 // ═══════════════════════════════════════════════════════════════
 const store={get(k){try{return localStorage.getItem(k);}catch(e){return null;}},set(k,v){try{localStorage.setItem(k,v);}catch(e){}}};
-const GS_URL='PASTE_APPS_SCRIPT_URL_HERE';
+const GS_URL='https://script.google.com/macros/s/AKfycbylcUzmt_l1cg65ACyIo3L4yXfpVQWwT_bXD7uV02drh6CINH4hMNpMgxL4d7oDWZ58Cw/exec';
 let playerName='';
 let currentFilter=store.get('ks3_y9_filter')||'none';
 let isLight=store.get('ks3_y9_light')==='1';
@@ -623,8 +623,8 @@ function saveScore(entry){
   const all=JSON.parse(store.get('ks3_y9_scores')||'[]');
   all.push(entry);
   store.set('ks3_y9_scores',JSON.stringify(all));
-  if(GS_URL&&GS_URL!=='PASTE_APPS_SCRIPT_URL_HERE'){
-    const p=new URLSearchParams({action:'addScore',name:entry.name||'Anonymous',game:entry.game||'',score:entry.score||0,detail:entry.detail||'',date:new Date().toLocaleString('en-GB')});
+  if(GS_URL&&GS_URL!=='https://script.google.com/macros/s/AKfycbylcUzmt_l1cg65ACyIo3L4yXfpVQWwT_bXD7uV02drh6CINH4hMNpMgxL4d7oDWZ58Cw/exec'){
+    const p=new URLSearchParams({action:'addScore',year:'Y9',name:entry.name||'Anonymous',game:entry.game||'',score:entry.score||0,detail:entry.detail||'',date:new Date().toLocaleString('en-GB')});
     try{const s=document.createElement('script');s.src=GS_URL+'?'+p.toString();s.onload=s.onerror=()=>{if(s.parentNode)s.parentNode.removeChild(s);};document.head.appendChild(s);}catch(e){}
   }
   renderLeaderboard();
