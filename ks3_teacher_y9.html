@@ -256,7 +256,7 @@ let countdown = 10;
 let timer = null;
 let annTimer;
 let currentTab = 'lb';
-let gsUrl = store.get('ks3_y9_gs_url') || '';
+let gsUrl = store.get('ks3_y9_gs_url') || 'https://script.google.com/macros/s/AKfycbylcUzmt_l1cg65ACyIo3L4yXfpVQWwT_bXD7uV02drh6CINH4hMNpMgxL4d7oDWZ58Cw/exec';
 
 // ── PIN ──
 function checkPin() {
@@ -322,7 +322,7 @@ function loadScores() {
       } else { processScores([]); }
     };
     s.onerror = () => { cleanup(); updateGsDot('err'); fallbackLocal(); };
-    s.src = gsUrl + '?action=getScores&callback=' + cb + '&t=' + Date.now();
+    s.src = gsUrl + '?action=getScores&year=Y9&callback=' + cb + '&t=' + Date.now();
     document.head.appendChild(s);
   } else {
     fallbackLocal();
@@ -446,7 +446,7 @@ function doClear() {
   if (gsUrl) {
     try {
       const s = document.createElement('script');
-      s.src = gsUrl + '?action=clearScores&t=' + Date.now();
+      s.src = gsUrl + '?action=clearScores&year=Y9&t=' + Date.now();
       s.onload = s.onerror = () => { if(s.parentNode) s.parentNode.removeChild(s); };
       document.head.appendChild(s);
     } catch(e){}
