@@ -560,8 +560,8 @@ function saveScore(entry) {
   all.push(entry);
   store.set('ks3_y8_scores', JSON.stringify(all));
   // Send to Google Sheets via script tag (works from GitHub Pages & local files)
-  if (GS_URL && GS_URL !== 'https://script.google.com/macros/s/AKfycbylcUzmt_l1cg65ACyIo3L4yXfpVQWwT_bXD7uV02drh6CINH4hMNpMgxL4d7oDWZ58Cw/exec') {
-    const p = new URLSearchParams({ action:'addScore', name:entry.name||'Anonymous',
+  if (GS_URL) {
+    const p = new URLSearchParams({ action:'addScore', year:'Y8', name:entry.name||'Anonymous',
       game:entry.game||'', score:entry.score||0, detail:entry.detail||'',
       date:new Date().toLocaleString('en-GB') });
     try {
