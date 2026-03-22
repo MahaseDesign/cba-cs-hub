@@ -125,7 +125,7 @@
 <!-- PIN SCREEN -->
 <div id="pin-screen">
   <h1>🖥 TEACHER DASHBOARD</h1>
-  <p>KS3 Year 8 Computer Science — CBA</p>
+  <p>KS3 Year 7 Computer Science — CBA</p>
   <input id="pin-input" type="password" placeholder="PIN" maxlength="8" onkeydown="if(event.key==='Enter')checkPin()"/>
   <div id="pin-error"></div>
   <button class="btn btn-pri" onclick="checkPin()" style="margin-top:.3rem;">ENTER →</button>
@@ -138,7 +138,7 @@
 <div class="topbar">
   <div>
     <div class="tb-logo">CBA <em style="color:var(--accent2);font-style:normal">//</em> CS DEPT</div>
-    <div class="tb-title">TEACHER DASHBOARD — KS3 YEAR 8</div>
+    <div class="tb-title">TEACHER DASHBOARD — KS3 YEAR 7</div>
   </div>
   <div class="tb-controls">
     <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--dim);">REFRESH: <span id="countdown" style="color:var(--accent);">10s</span></div>
@@ -208,7 +208,7 @@
 </div>
 
 <div class="bottombar">
-  <div class="footer-txt">CORBY BUSINESS ACADEMY — COMPUTER SCIENCE DEPARTMENT // KS3 YEAR 8</div>
+  <div class="footer-txt">CORBY BUSINESS ACADEMY — COMPUTER SCIENCE DEPARTMENT // KS3 YEAR 7</div>
   <div class="footer-txt" id="last-update">Last update: —</div>
 </div>
 
@@ -256,7 +256,7 @@ let countdown = 10;
 let timer = null;
 let annTimer;
 let currentTab = 'lb';
-let gsUrl = store.get('ks3_y8_gs_url') || 'https://script.google.com/macros/s/AKfycbylcUzmt_l1cg65ACyIo3L4yXfpVQWwT_bXD7uV02drh6CINH4hMNpMgxL4d7oDWZ58Cw/exec';
+let gsUrl = store.get('ks3_gs_url') || 'https://script.google.com/macros/s/AKfycbylcUzmt_l1cg65ACyIo3L4yXfpVQWwT_bXD7uV02drh6CINH4hMNpMgxL4d7oDWZ58Cw/exec';
 
 // ── PIN ──
 function checkPin() {
@@ -318,7 +318,7 @@ function loadScores() {
       cleanup();
       if (data && data.status === 'ok' && Array.isArray(data.scores)) {
         // Merge GS scores with any local scores not yet synced
-        const local = JSON.parse(store.get('ks3_y8_scores') || '[]');
+        const local = JSON.parse(store.get('ks3_scores') || '[]');
         const merged = [...data.scores];
         local.forEach(e => {
           if (!merged.some(s => s.name===e.name && s.date===e.date && s.game===e.game))
@@ -329,7 +329,7 @@ function loadScores() {
       } else { fallbackLocal(); }
     };
     s.onerror = () => { cleanup(); updateGsDot('err'); fallbackLocal(); };
-    s.src = gsUrl + '?action=getScores&year=Y8&callback=' + cb + '&t=' + Date.now();
+    s.src = gsUrl + '?action=getScores&year=Y7&callback=' + cb + '&t=' + Date.now();
     document.head.appendChild(s);
   } else {
     fallbackLocal();
@@ -337,12 +337,19 @@ function loadScores() {
 }
 
 function fallbackLocal() {
-  const raw = JSON.parse(store.get('ks3_y8_scores') || '[]');
+  const raw = JSON.parse(store.get('ks3_scores') || '[]');
   processScores(raw);
 }
 
 function processScores(raw) {
-  scores = raw;
+  // Normalise field names — handle both KS3 script (score) and GCSE script (totalScore)
+  scores = raw.map(e => ({
+    name:   e.name   || '',
+    game:   e.game   || '',
+    score:  e.score  != null ? Number(e.score) : Number(e.totalScore) || 0,
+    detail: e.detail || '',
+    date:   e.date   || ''
+  })).filter(e => e.name);
   renderAll();
   const el = document.getElementById('last-update');
   if (el) el.textContent = 'Last update: ' + new Date().toLocaleTimeString('en-GB');
@@ -428,7 +435,7 @@ function switchTab(tab, btn) {
 // ── GOOGLE SHEETS ──
 function saveGsUrl() {
   gsUrl = document.getElementById('gs-url').value.trim();
-  store.set('ks3_y8_gs_url', gsUrl);
+  store.set('ks3_gs_url', gsUrl);
   updateGsDot();
 }
 function updateGsDot(state) {
@@ -445,7 +452,7 @@ function updateGsDot(state) {
 function confirmClear() { document.getElementById('clear-modal').classList.add('open'); }
 function doClear() {
   document.getElementById('clear-modal').classList.remove('open');
-  store.set('ks3_y8_scores', '[]');
+  store.set('ks3_scores', '[]');
   scores = [];
   renderAll();
   announce('🗑 SCORES CLEARED');
@@ -453,7 +460,7 @@ function doClear() {
   if (gsUrl) {
     try {
       const s = document.createElement('script');
-      s.src = gsUrl + '?action=clearScores&year=Y8&t=' + Date.now();
+      s.src = gsUrl + '?action=clearScores&year=Y7&t=' + Date.now();
       s.onload = s.onerror = () => { if(s.parentNode) s.parentNode.removeChild(s); };
       document.head.appendChild(s);
     } catch(e){}
