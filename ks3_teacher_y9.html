@@ -342,7 +342,14 @@ function fallbackLocal() {
 }
 
 function processScores(raw) {
-  scores = raw;
+  // Normalise field names — handle both KS3 script (score) and GCSE script (totalScore)
+  scores = raw.map(e => ({
+    name:   e.name   || '',
+    game:   e.game   || '',
+    score:  e.score  != null ? Number(e.score) : Number(e.totalScore) || 0,
+    detail: e.detail || '',
+    date:   e.date   || ''
+  })).filter(e => e.name);
   renderAll();
   const el = document.getElementById('last-update');
   if (el) el.textContent = 'Last update: ' + new Date().toLocaleTimeString('en-GB');
