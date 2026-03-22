@@ -210,11 +210,29 @@
 <body>
 <div class="filter-overlay" id="filter-overlay"></div>
 <div class="scanline"></div>
-<div id="name-bar" style="background:var(--surface2);border-bottom:1px solid var(--border);padding:.5rem 1.2rem;display:flex;align-items:center;gap:.8rem;position:relative;z-index:20;flex-wrap:wrap;">
-  <span style="font-family:'Share Tech Mono',monospace;font-size:.72rem;color:var(--text-dim);">YOUR NAME:</span>
-  <input id="player-name-input" type="text" placeholder="Enter your name…" maxlength="30" style="font-family:'Share Tech Mono',monospace;font-size:.8rem;background:var(--surface);border:1px solid var(--border);color:var(--text);padding:.3rem .7rem;outline:none;width:180px;" oninput="playerName=this.value.trim()"/>
-  <span style="font-family:'Share Tech Mono',monospace;font-size:.65rem;color:var(--text-dim);">Your scores will appear on the leaderboard</span>
+<!-- NAME REGISTRATION MODAL -->
+<div id="name-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:500;align-items:center;justify-content:center;">
+  <div style="background:var(--surface);border:1px solid var(--accent);padding:2rem 2rem 1.8rem;max-width:380px;width:90%;text-align:center;">
+    <div style="font-size:2rem;margin-bottom:.8rem;">⌨</div>
+    <div style="font-family:'Orbitron',monospace;font-size:1rem;color:var(--accent);margin-bottom:.4rem;letter-spacing:.1em;">YEAR 7 — KEYWORD ARENA</div>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:.75rem;color:var(--text-dim);margin-bottom:1.4rem;line-height:1.6;">Enter your name to appear on the class leaderboard. Your teacher can see your score!</div>
+    <input id="name-modal-input" type="text" placeholder="Your first name…" maxlength="30"
+      style="width:100%;font-family:'Share Tech Mono',monospace;font-size:1.1rem;text-align:center;background:var(--surface2);border:1px solid var(--border);color:var(--text);padding:.6rem 1rem;outline:none;margin-bottom:.3rem;letter-spacing:.05em;"
+      onkeydown="if(event.key==='Enter')submitName()"/>
+    <div id="name-modal-error" style="font-family:'Share Tech Mono',monospace;font-size:.68rem;color:var(--red);min-height:1.2rem;margin-bottom:.6rem;"></div>
+    <button onclick="submitName()" style="width:100%;font-family:'Orbitron',monospace;font-size:.78rem;font-weight:700;letter-spacing:.1em;padding:.7rem;background:var(--accent);border:none;color:var(--bg);cursor:pointer;">ENTER ARENA →</button>
+    <div style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--dim);margin-top:.9rem;">Only your name and score are saved</div>
+  </div>
 </div>
+
+<!-- NAME BAR -->
+<div id="name-bar" style="background:var(--surface2);border-bottom:1px solid var(--border);padding:.4rem 1.2rem;display:flex;align-items:center;gap:.8rem;position:relative;z-index:20;flex-wrap:wrap;">
+  <span style="font-family:'Share Tech Mono',monospace;font-size:.7rem;color:var(--text-dim);">PLAYING AS:</span>
+  <span id="name-display" style="font-family:'Orbitron',monospace;font-size:.78rem;color:var(--accent);font-weight:700;"></span>
+  <button onclick="changeName()" style="font-family:'Share Tech Mono',monospace;font-size:.62rem;background:transparent;border:1px solid var(--border);color:var(--dim);padding:.2rem .55rem;cursor:pointer;margin-left:.3rem;">✏ CHANGE</button>
+  <span style="font-family:'Share Tech Mono',monospace;font-size:.62rem;color:var(--text-dim);margin-left:auto;">Scores go to the class leaderboard 📡</span>
+</div>
+
 
 <header>
   <h1>⌨ KS3 COMPUTER SCIENCE</h1>
@@ -537,8 +555,46 @@ function shuffle(arr) {
 // THEME & FILTER
 // ═══════════════════════════════════════════════════════════
 const store = { get(k){try{return localStorage.getItem(k);}catch(e){return null;}}, set(k,v){try{localStorage.setItem(k,v);}catch(e){}} };
+let playerName = store.get('ks3_scores_name') || '';
+
+function submitName() {
+  const inp = document.getElementById('name-modal-input');
+  const err = document.getElementById('name-modal-error');
+  const name = inp ? inp.value.trim() : '';
+  if (!name) { if(err) err.textContent = '⚠ Please enter your name'; return; }
+  if (name.length < 2) { if(err) err.textContent = '⚠ Must be at least 2 characters'; return; }
+  playerName = name;
+  store.set('ks3_scores_name', name);
+  const nd = document.getElementById('name-display');
+  if(nd) nd.textContent = name;
+  const modal = document.getElementById('name-modal');
+  if(modal) modal.style.display = 'none';
+}
+
+function changeName() {
+  const inp = document.getElementById('name-modal-input');
+  const err = document.getElementById('name-modal-error');
+  const modal = document.getElementById('name-modal');
+  if(inp) inp.value = playerName;
+  if(err) err.textContent = '';
+  if(modal) { modal.style.display = 'flex'; setTimeout(()=>inp&&inp.focus(),50); }
+}
+
+function checkName() {
+  if (!playerName) {
+    const inp   = document.getElementById('name-modal-input');
+    const err   = document.getElementById('name-modal-error');
+    const modal = document.getElementById('name-modal');
+    if(inp) inp.value = '';
+    if(err) err.textContent = '';
+    if(modal) { modal.style.display = 'flex'; setTimeout(()=>inp&&inp.focus(),50); }
+    return false;
+  }
+  return true;
+}
+
 const GS_URL = 'https://script.google.com/macros/s/AKfycbylcUzmt_l1cg65ACyIo3L4yXfpVQWwT_bXD7uV02drh6CINH4hMNpMgxL4d7oDWZ58Cw/exec';
-let playerName = '';
+
 let currentFilter = store.get('ks3_filter') || 'none';
 let isLight       = store.get('ks3_light') === '1';
 
@@ -903,6 +959,13 @@ function setMsg(id,text,type){ const el=document.getElementById(id); el.textCont
 
 // ── INIT ──
 document.addEventListener("DOMContentLoaded",function(){
+  // Show name on bar or prompt for name
+  if (playerName) {
+    document.getElementById('name-display').textContent = playerName;
+  } else {
+    document.getElementById('name-modal').style.display = 'flex';
+    setTimeout(() => document.getElementById('name-modal-input').focus(), 100);
+  }
   initWordle(); initQuiz(); initConnect4(); initHangman();
 });
 </script>
