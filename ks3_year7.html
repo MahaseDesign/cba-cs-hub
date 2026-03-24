@@ -205,6 +205,37 @@
   /* ── FOOTER ── */
   footer { text-align:center; padding:1.2rem; font-family:'Share Tech Mono',monospace; font-size:0.7rem; color:var(--text-dim); border-top:1px solid var(--border); position:relative; z-index:10; letter-spacing:0.05em; }
   .flex-center { display:flex; justify-content:center; gap:0.8rem; flex-wrap:wrap; }
+
+  /* ── DYSLEXIA / SUPERPOWER MODE ── */
+  @font-face {
+    font-family:'OpenDyslexic';
+    src:url('https://cdn.jsdelivr.net/npm/opendyslexic@1.0.3/fonts/OpenDyslexic-Regular.otf') format('opentype');
+    font-weight:normal;
+  }
+  @font-face {
+    font-family:'OpenDyslexic';
+    src:url('https://cdn.jsdelivr.net/npm/opendyslexic@1.0.3/fonts/OpenDyslexic-Bold.otf') format('opentype');
+    font-weight:bold;
+  }
+  body.dyslexia #quiz-question,body.dyslexia .quiz-opt,body.dyslexia .c4-opt,
+  body.dyslexia #c4-q-text,body.dyslexia .hm-letter,body.dyslexia #hm-hint,
+  body.dyslexia #wordle-hint,body.dyslexia #hm-lives,body.dyslexia #hm-guessed,
+  body.dyslexia .card-desc { font-family:'OpenDyslexic','Comic Sans MS',cursive !important; font-weight:bold !important; }
+  body.dyslexia #quiz-question { font-size:1.25rem; line-height:1.8; letter-spacing:.03em; }
+  body.dyslexia .quiz-opt      { font-size:.95rem;  line-height:1.7; padding:.9rem 1rem; }
+  body.dyslexia .c4-opt        { font-size:.88rem;  line-height:1.7; }
+  body.dyslexia #hm-hint       { font-size:.92rem;  line-height:1.8; }
+  body.dyslexia #wordle-hint   { font-size:.96rem;  line-height:1.8; }
+  body.dyslexia.light          { --bg:#fdf8ee; --surface:#fffdf5; --surface2:#f5edd6; --border:#d4c4a0; }
+  .toggle-btn.active-super {
+    border-color:#f0a500; color:#f0a500;
+    background:rgba(240,165,0,.12);
+    animation:superPulse 2s infinite;
+  }
+  @keyframes superPulse {
+    0%,100%{box-shadow:0 0 8px rgba(240,165,0,.3);}
+    50%{box-shadow:0 0 18px rgba(240,165,0,.6);}
+  }
 </style>
 </head>
 <body>
@@ -241,6 +272,7 @@
     <button class="toggle-btn" id="btn-light"  onclick="toggleLight()">☀ LIGHT</button>
     <button class="toggle-btn" id="btn-blue"   onclick="toggleFilter('blue')">🔵 BLUE TINT</button>
     <button class="toggle-btn" id="btn-green"  onclick="toggleFilter('green')">🟢 GREEN TINT</button>
+    <button class="toggle-btn" id="btn-super"  onclick="toggleSuperpower()" title="Dyslexia-friendly font">⚡ SUPERPOWER</button>
   </div>
 </header>
 
@@ -595,17 +627,29 @@ function checkName() {
 
 const GS_URL = 'https://script.google.com/macros/s/AKfycbylcUzmt_l1cg65ACyIo3L4yXfpVQWwT_bXD7uV02drh6CINH4hMNpMgxL4d7oDWZ58Cw/exec';
 
-let currentFilter = store.get('ks3_filter') || 'none';
-let isLight       = store.get('ks3_light') === '1';
+let currentFilter  = store.get('ks3_filter') || 'none';
+let isLight        = store.get('ks3_light') === '1';
+let isSuperpower   = store.get('ks3_super') === '1';
 
 function applyAll() {
   document.body.classList.toggle('light', isLight);
+  document.body.classList.toggle('dyslexia', isSuperpower);
   document.getElementById('btn-light').classList.toggle('active-light', isLight);
+  const sb = document.getElementById('btn-super');
+  if (sb) {
+    sb.classList.toggle('active-super', isSuperpower);
+    sb.textContent = isSuperpower ? '⚡ SUPERPOWER ON' : '⚡ SUPERPOWER';
+  }
   document.body.classList.remove('filter-blue','filter-green');
   document.getElementById('btn-blue').classList.remove('active-blue');
   document.getElementById('btn-green').classList.remove('active-green');
   if (currentFilter==='blue')  { document.body.classList.add('filter-blue');  document.getElementById('btn-blue').classList.add('active-blue'); }
   if (currentFilter==='green') { document.body.classList.add('filter-green'); document.getElementById('btn-green').classList.add('active-green'); }
+}
+function toggleSuperpower() {
+  isSuperpower = !isSuperpower;
+  store.set('ks3_super', isSuperpower ? '1' : '0');
+  applyAll();
 }
 function toggleLight() {
   isLight = !isLight;
