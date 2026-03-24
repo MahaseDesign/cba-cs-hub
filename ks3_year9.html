@@ -19,6 +19,51 @@
   body.light .c4-opt,.light .quiz-opt { background:#edf2f7; color:var(--text); }
   body.light .code-block { background:#1e1e2e; color:#cdd6f4; }
 
+  /* ── DYSLEXIA / SUPERPOWER MODE ── */
+  @font-face {
+    font-family:'OpenDyslexic';
+    src:url('https://cdn.jsdelivr.net/npm/opendyslexic@1.0.3/fonts/OpenDyslexic-Regular.otf') format('opentype');
+    font-weight:normal;
+  }
+  @font-face {
+    font-family:'OpenDyslexic';
+    src:url('https://cdn.jsdelivr.net/npm/opendyslexic@1.0.3/fonts/OpenDyslexic-Bold.otf') format('opentype');
+    font-weight:bold;
+  }
+  body.dyslexia {
+    --dysfont:'OpenDyslexic','Comic Sans MS',cursive;
+  }
+  /* Apply dyslexic font to all reading content */
+  body.dyslexia .quiz-opt, body.dyslexia .ch-opt, body.dyslexia .c4-opt,
+  body.dyslexia #quiz-question, body.dyslexia #c4-q-text,
+  body.dyslexia .ch-question, body.dyslexia #quiz-explanation,
+  body.dyslexia #ch-explanation, body.dyslexia #js-explanation,
+  body.dyslexia .hm-letter, body.dyslexia #hm-hint, body.dyslexia #hm-lives,
+  body.dyslexia #hm-guessed, body.dyslexia #wordle-hint,
+  body.dyslexia .word-item, body.dyslexia .card-desc,
+  body.dyslexia .card-topic, body.dyslexia #py-question, body.dyslexia #js-question,
+  body.dyslexia .ch-topic { font-family:var(--dysfont) !important; }
+  body.dyslexia #quiz-question { font-size:1.25rem; line-height:1.8; letter-spacing:.03em; }
+  body.dyslexia .quiz-opt      { font-size:.95rem;  line-height:1.7; letter-spacing:.02em; padding:.9rem 1rem; }
+  body.dyslexia .ch-opt        { font-size:.88rem;  line-height:1.7; letter-spacing:.02em; }
+  body.dyslexia .c4-opt        { font-size:.86rem;  line-height:1.7; }
+  body.dyslexia #hm-hint       { font-size:.92rem;  line-height:1.8; }
+  body.dyslexia #wordle-hint   { font-size:.96rem;  line-height:1.8; }
+  body.dyslexia .ch-question   { font-size:1.15rem; line-height:1.8; letter-spacing:.02em; }
+  /* Cream tint helps many dyslexic readers */
+  body.dyslexia.light          { --bg:#fdf8ee; --surface:#fffdf5; --surface2:#f5edd6; --border:#d4c4a0; }
+  /* Superpower button styling */
+  .toggle-btn.active-super {
+    border-color:#f0a500; color:#f0a500;
+    background:rgba(240,165,0,.12);
+    box-shadow:0 0 12px rgba(240,165,0,.3);
+    animation:superPulse 2s infinite;
+  }
+  @keyframes superPulse {
+    0%,100% { box-shadow:0 0 8px rgba(240,165,0,.3); }
+    50%      { box-shadow:0 0 18px rgba(240,165,0,.6); }
+  }
+
   .filter-overlay { position:fixed;inset:0;pointer-events:none;z-index:9999;opacity:0;transition:opacity .3s; }
   body.filter-blue  .filter-overlay { background:rgba(100,160,230,.18);opacity:1; }
   body.filter-green .filter-overlay { background:rgba(80,200,120,.16);opacity:1; }
@@ -235,6 +280,7 @@
     <button class="toggle-btn" id="btn-light" onclick="toggleLight()">☀ LIGHT</button>
     <button class="toggle-btn" id="btn-blue"  onclick="toggleFilter('blue')">🔵 BLUE TINT</button>
     <button class="toggle-btn" id="btn-green" onclick="toggleFilter('green')">🟢 GREEN TINT</button>
+    <button class="toggle-btn" id="btn-super" onclick="toggleSuperpower()" title="Switches to dyslexia-friendly font with extra spacing">⚡ SUPERPOWER</button>
   </div>
 </header>
 
@@ -244,8 +290,8 @@
   <button class="nav-btn" onclick="showScreen('quiz');initQuiz()">QUIZ</button>
   <button class="nav-btn" onclick="showScreen('connect4');initConnect4()">CONNECT 4</button>
   <button class="nav-btn" onclick="showScreen('hangman');initHangman()">HANGMAN</button>
-  <button class="nav-btn" onclick="showScreen('python');initChallenge('python')">🐍 PYTHON</button>
-  <button class="nav-btn" onclick="showScreen('javascript');initChallenge('javascript')">⚡ JS</button>
+  <button class="nav-btn" onclick="showScreen('python');initChallenge('python')">🐍 PYTHON A</button>
+  <button class="nav-btn" onclick="showScreen('javascript');initChallenge('javascript')">🐍 PYTHON B</button>
   <button class="nav-btn" onclick="showScreen('leaderboard');renderLeaderboard()">🏆 BOARD</button>
 </nav>
 
@@ -277,15 +323,15 @@
   </div>
   <div class="game-card" onclick="showScreen('python');initChallenge('python')" style="--accent:var(--green)">
     <span class="card-icon">🐍</span>
-    <div class="card-title" style="color:var(--green)">PYTHON CHALLENGES</div>
-    <div class="card-desc">Read Python code snippets and answer questions. Covers loops, functions, lists and more.</div>
-    <div class="card-topic" style="color:#3572A5">▸ 25 PYTHON TASKS</div>
+    <div class="card-title" style="color:var(--green)">PYTHON — PART A</div>
+    <div class="card-desc">Theory questions on variables, loops, functions, lists, errors and more.</div>
+    <div class="card-topic" style="color:#3572A5">▸ THEORY + CODE TASKS</div>
   </div>
-  <div class="game-card" onclick="showScreen('javascript');initChallenge('javascript')" style="--accent:#f7df1e">
-    <span class="card-icon">⚡</span>
-    <div class="card-title" style="color:#b8a800">JS CHALLENGES</div>
-    <div class="card-desc">Read JavaScript snippets and predict the output or fix the bug.</div>
-    <div class="card-topic" style="color:#b8a800">▸ 20 JS TASKS</div>
+  <div class="game-card" onclick="showScreen('javascript');initChallenge('javascript')" style="--accent:var(--green)">
+    <span class="card-icon">🐍</span>
+    <div class="card-title" style="color:var(--green)">PYTHON — PART B</div>
+    <div class="card-desc">Advanced Python: dictionaries, classes, file handling, recursion and comprehensions.</div>
+    <div class="card-topic" style="color:#3572A5">▸ THEORY + CODE TASKS</div>
   </div>
 </div>
 
@@ -383,7 +429,7 @@
 <!-- PYTHON CHALLENGES -->
 <div id="python" class="screen">
   <div class="challenge-screen" id="py-screen">
-    <div class="section-header"><h2>🐍 PYTHON CHALLENGES</h2><p>// read the code — predict the output or spot the concept //</p></div>
+    <div class="section-header"><h2>🐍 PYTHON CHALLENGES — PART A</h2><p>// theory questions + code tasks: loops, functions, lists + more //</p></div>
     <div id="py-game">
       <div class="challenge-header">
         <div class="ch-meta">TASK <span id="py-num">1</span>/10 &nbsp;·&nbsp; SCORE <span id="py-score">0</span></div>
@@ -395,7 +441,7 @@
         <div class="ch-question" id="py-question">Loading…</div>
         <div class="code-block" id="py-code" style="display:none"></div>
         <div class="ch-options" id="py-options"></div>
-        <div id="ch-explanation" style="display:none"></div>
+        <div id="py-explanation" style="display:none"></div>
       </div>
       <div class="flex-center"><button class="btn" id="py-next-btn" onclick="chNext('python')" style="display:none">NEXT →</button></div>
     </div>
@@ -409,10 +455,10 @@
   </div>
 </div>
 
-<!-- JAVASCRIPT CHALLENGES -->
+<!-- PYTHON CHALLENGES PART B -->
 <div id="javascript" class="screen">
   <div class="challenge-screen" id="js-screen">
-    <div class="section-header"><h2>⚡ JAVASCRIPT CHALLENGES</h2><p>// read the code — predict the output or spot the concept //</p></div>
+    <div class="section-header"><h2>🐍 PYTHON CHALLENGES — PART B</h2><p>// advanced python: dictionaries, classes, recursion + more //</p></div>
     <div id="js-game">
       <div class="challenge-header">
         <div class="ch-meta">TASK <span id="js-num">1</span>/10 &nbsp;·&nbsp; SCORE <span id="js-score">0</span></div>
@@ -432,7 +478,7 @@
       <div class="ch-score-card">
         <div class="big-score" id="js-final-score"></div>
         <p id="js-final-msg" style="font-family:'Share Tech Mono',monospace;color:var(--text-dim);margin-bottom:1.2rem"></p>
-        <button class="btn" style="border-color:#f7df1e;color:#b8a800" onclick="initChallenge('javascript')">PLAY AGAIN</button>
+        <button class="btn green" onclick="initChallenge('javascript')">PLAY AGAIN</button>
       </div>
     </div>
   </div>
@@ -551,57 +597,225 @@ const QUIZ_QUESTIONS = [
 // PYTHON CHALLENGES (25 tasks)
 // ═══════════════════════════════════════════════════════════════
 const PYTHON_CHALLENGES = [
-  { topic:"Variables & Output", q:"What is the output of this code?", code:"name = 'Alex'\nage = 14\nprint(name, age)", opts:["Alex 14","Alex\n14","'Alex' 14","Error"], ans:0, exp:"print() with multiple arguments separates them with a space by default. Output: Alex 14" },
-  { topic:"Arithmetic", q:"What does the % operator do?", code:"print(17 % 5)", opts:["3","2","1","3.4"], ans:1, exp:"% is the modulus operator — it returns the remainder. 17 / 5 = 3 remainder 2, so 17 % 5 = 2." },
-  { topic:"String Concatenation", q:"What is the output?", code:"first = 'Hello'\nsecond = 'World'\nprint(first + ' ' + second)", opts:["HelloWorld","Hello World","Hello+World","Error"], ans:1, exp:"The + operator joins strings. A space string ' ' is added in between." },
-  { topic:"For Loops", q:"How many times does this loop run?", code:"for i in range(1, 6):\n    print(i)", opts:["6","4","10","5"], ans:3, exp:"range(1, 6) produces 1, 2, 3, 4, 5 — five values. The end value (6) is excluded." },
-  { topic:"While Loops", q:"What is the final value of count?", code:"count = 0\nwhile count < 4:\n    count = count + 1\nprint(count)", opts:["3","5","4","0"], ans:2, exp:"The loop adds 1 to count until count is no longer less than 4. It stops when count = 4." },
-  { topic:"Lists", q:"What does this print?", code:"fruits = ['apple', 'banana', 'cherry']\nprint(fruits[1])", opts:["apple","cherry","banana","Error"], ans:2, exp:"Lists are zero-indexed. Index 0 = apple, index 1 = banana, index 2 = cherry." },
-  { topic:"List Methods", q:"What is the output?", code:"nums = [3, 1, 4, 1, 5]\nnums.append(9)\nprint(len(nums))", opts:["5","6","9","4"], ans:1, exp:"append() adds one item to the end, making the list 6 items long. len() returns 6." },
-  { topic:"Functions", q:"What does this function return?", code:"def square(n):\n    return n * n\nprint(square(7))", opts:["7","14","77","49"], ans:3, exp:"The function multiplies n by itself. square(7) = 7 * 7 = 49." },
-  { topic:"Functions", q:"What is the output?", code:"def greet(name):\n    print('Hello, ' + name + '!')\ngreet('Sam')", opts:["Hello, !","Hello, Sam","Hello, Sam!","Error"], ans:2, exp:"The function prints 'Hello, ' + the name argument + '!'. Output: Hello, Sam!" },
-  { topic:"If/Else", q:"What is printed?", code:"score = 75\nif score >= 80:\n    print('Distinction')\nelif score >= 60:\n    print('Merit')\nelse:\n    print('Pass')", opts:["Distinction","Merit","Pass","Nothing"], ans:1, exp:"75 is not >= 80, but it is >= 60, so the elif runs and prints Merit." },
-  { topic:"String Methods", q:"What does this print?", code:"word = 'python'\nprint(word.upper())", opts:["Python","PYTHON","python","PYthon"], ans:1, exp:"The .upper() method converts all characters in a string to uppercase." },
-  { topic:"Type Conversion", q:"What does int() do here?", code:"num = input('Enter a number: ')\nnum = int(num)\nprint(num + 5)", opts:["Prints 'num + 5'","Converts the string input to an integer, then adds 5","Causes an error","Prints 5"], ans:1, exp:"input() always returns a string. int() converts it to an integer so arithmetic works." },
-  { topic:"Nested Loops", q:"How many times is 'Hi' printed?", code:"for i in range(3):\n    for j in range(2):\n        print('Hi')", opts:["5","2","3","6"], ans:3, exp:"The outer loop runs 3 times; the inner loop runs 2 times each time. 3 × 2 = 6 total prints." },
-  { topic:"Lists & Loops", q:"What is the output?", code:"total = 0\nfor n in [2, 4, 6]:\n    total += n\nprint(total)", opts:["246","6","12","2"], ans:2, exp:"total starts at 0. 0+2=2, 2+4=6, 6+6=12. The += operator adds to the existing value." },
-  { topic:"Slicing", q:"What does this print?", code:"word = 'computer'\nprint(word[0:4])", opts:["comp","ompu","compu","Error"], ans:0, exp:"Slicing [0:4] returns characters at index 0, 1, 2, 3 — the end index (4) is excluded. Result: comp." },
-  { topic:"Dictionaries", q:"What does this print?", code:"student = {'name': 'Ali', 'age': 15}\nprint(student['name'])", opts:["15","Ali","student","Error"], ans:1, exp:"Dictionaries store key-value pairs. student['name'] retrieves the value for the key 'name' = 'Ali'." },
-  { topic:"Boolean Logic", q:"What is the output?", code:"x = 10\nprint(x > 5 and x < 20)", opts:["Error","False","None","True"], ans:3, exp:"10 > 5 is True and 10 < 20 is True. True AND True = True." },
-  { topic:"Error Types", q:"What type of error is this?", code:"# Missing colon\nif x > 5\n    print(x)", opts:["Runtime Error","Logic Error","Syntax Error","Name Error"], ans:2, exp:"The missing colon after if x > 5 breaks Python's grammar rules — this is a syntax error." },
-  { topic:"Return Values", q:"What is the output?", code:"def add(a, b):\n    return a + b\nresult = add(3, 4)\nprint(result * 2)", opts:["7","14","34","Error"], ans:1, exp:"add(3, 4) returns 7. Then 7 * 2 = 14." },
-  { topic:"String Formatting", q:"What does this print?", code:"name = 'Maya'\nage = 13\nprint(f'My name is {name} and I am {age}.')", opts:["f'My name is {name}...'","Error","My name is Maya and I am 13.","My name is {name} and I am {age}."], ans:2, exp:"f-strings (f'...') let you embed variables directly in strings using {} placeholders." },
-  { topic:"List Comprehension", q:"What does this create?", code:"squares = [x**2 for x in range(1, 5)]\nprint(squares)", opts:["[1, 4, 9, 16, 25]","[1, 2, 3, 4]","[1, 4, 9, 16]","[2, 4, 6, 8]"], ans:2, exp:"range(1, 5) gives 1, 2, 3, 4. Squaring each: 1, 4, 9, 16. range stops before 5." },
-  { topic:"Recursion", q:"What is the output of fact(3)?", code:"def fact(n):\n    if n == 1:\n        return 1\n    return n * fact(n-1)", opts:["3","1","6","Error"], ans:2, exp:"fact(3) = 3 * fact(2) = 3 * 2 * fact(1) = 3 * 2 * 1 = 6. This is a recursive factorial." },
-  { topic:"Exception Handling", q:"What keyword starts error handling in Python?", code:"try:\n    x = int('hello')\nexcept ValueError:\n    print('Not a number!')", opts:["catch","handle","except","error"], ans:2, exp:"Python uses try/except for error handling. The except block runs if the try block raises an exception." },
-  { topic:"File Handling", q:"What does this line do?", code:"with open('data.txt', 'r') as f:\n    content = f.read()", opts:["Creates a file","Deletes a file","Opens the file for reading and stores contents in content","Writes to a file"], ans:2, exp:"'r' mode opens for reading. The with statement ensures the file closes automatically after use." },
-  { topic:"Classes", q:"What does __init__ do in a Python class?", code:"class Dog:\n    def __init__(self, name):\n        self.name = name", opts:["Deletes the object","Prints the class","Is called automatically when a new object is created","Returns the object's name"], ans:2, exp:"__init__ is the constructor — it runs automatically when you create a new instance with Dog('Rex')." },
+
+  // ── THEORY QUESTIONS ──────────────────────────────────────────────────
+  { topic:"Variables", q:"What is a variable in Python?",
+    opts:["A type of loop","A named container that stores a value","A function","A fixed number that never changes"], ans:1,
+    exp:"A variable is like a labelled box — it stores a value that can change. Example: score = 10" },
+
+  { topic:"Data Types", q:"Which data type would you use to store someone's name?",
+    opts:["Integer (int)","Boolean (bool)","Float","String (str)"], ans:3,
+    exp:"Strings store text. In Python: name = 'Alex'. Always use quotes around string values." },
+
+  { topic:"Data Types", q:"What is the difference between an integer and a float in Python?",
+    opts:["They are the same","Integers are text; floats are numbers","An integer is a whole number; a float has a decimal point","Floats are always bigger"], ans:2,
+    exp:"int stores whole numbers (5, -3, 100). float stores decimals (3.14, 9.5). Example: age = 14 vs price = 2.99" },
+
+  { topic:"Boolean Logic", q:"What values can a Boolean hold?",
+    opts:["Yes or No","1 or 0","Any number","True or False"], ans:3,
+    exp:"Boolean variables can only be True or False. They are used in conditions: is_logged_in = True" },
+
+  { topic:"Print & Input", q:"What does the input() function always return in Python?",
+    opts:["An integer","A float","A string","A boolean"], ans:2,
+    exp:"input() always returns a string — even if the user types a number. Use int() to convert it: age = int(input('Age: '))" },
+
+  { topic:"Selection", q:"Which keyword starts a conditional statement in Python?",
+    opts:["when","check","if","select"], ans:2,
+    exp:"Python uses if, elif and else for selection. Example: if score > 50: print('Pass')" },
+
+  { topic:"Iteration", q:"What is the difference between a for loop and a while loop?",
+    opts:["They are identical","A for loop repeats a fixed number of times; a while loop repeats while a condition is True","While loops are faster","For loops only work with lists"], ans:1,
+    exp:"for loops: for i in range(5) — runs exactly 5 times. while loops: while lives > 0 — runs until the condition is False." },
+
+  { topic:"Functions", q:"What keyword is used to define a function in Python?",
+    opts:["function","define","func","def"], ans:3,
+    exp:"Python uses def. Example: def greet(): — followed by an indented block. Call it with: greet()" },
+
+  { topic:"Functions", q:"What does the return keyword do in a function?",
+    opts:["Prints a value to the screen","Ends the whole program","Sends a value back to where the function was called","Repeats the function"], ans:2,
+    exp:"return exits the function and passes a value back. Example: def double(n): return n * 2 — result = double(5) gives 6." },
+
+  { topic:"Lists", q:"How do you access the first item in a Python list called scores?",
+    opts:["scores[1]","scores(0)","scores[0]","scores.first()"], ans:2,
+    exp:"Python lists are zero-indexed. scores[0] is the first item, scores[1] the second. Example: names = ['Ali','Beth','Carl'] — names[0] = 'Ali'" },
+
+  { topic:"Lists", q:"Which method adds an item to the END of a Python list?",
+    opts:["list.add()","list.insert()","list.push()","list.append()"], ans:3,
+    exp:"append() adds to the end. Example: fruits = ['apple'] then fruits.append('banana') gives ['apple', 'banana']" },
+
+  { topic:"String Methods", q:"What does the .upper() method do to a string?",
+    opts:["Reverses it","Makes it longer","Converts all characters to uppercase","Removes spaces"], ans:2,
+    exp:"'hello'.upper() returns 'HELLO'. Similarly .lower() gives lowercase. Useful for comparing input without case issues." },
+
+  { topic:"Errors", q:"What type of error occurs when Python cannot understand your code's grammar?",
+    opts:["Runtime Error","Logic Error","Syntax Error","Name Error"], ans:2,
+    exp:"Syntax errors break Python's grammar rules — e.g. missing a colon after if x > 5. The program won't run at all." },
+
+  { topic:"Errors", q:"What is a logic error?",
+    opts:["Code that crashes","Code with wrong spelling","Code that runs but gives the wrong answer","Missing brackets"], ans:2,
+    exp:"Logic errors: the code runs without crashing but the output is wrong. Example: writing score + 1 when you meant score * 2." },
+
+  { topic:"Modules", q:"What does import random allow you to do?",
+    opts:["Connect to the internet","Create graphics","Generate random numbers and choices","Sort lists automatically"], ans:2,
+    exp:"import random gives access to functions like random.randint(1,10) which picks a random whole number between 1 and 10." },
+
+  // ── CODE TASKS ────────────────────────────────────────────────────────
+  { topic:"Output Task", q:"What does this code print?",
+    code:"print('Hello')\nprint('World')", 
+    opts:["Hello World","HelloWorld","Hello\nWorld","Hello then World on separate lines"], ans:3,
+    exp:"Each print() outputs on its own line. Output:\nHello\nWorld" },
+
+  { topic:"Variables Task", q:"What is stored in total after this runs?",
+    code:"a = 10\nb = 3\ntotal = a + b\nprint(total)",
+    opts:["103","7","ab","13"], ans:3,
+    exp:"a + b = 10 + 3 = 13. Python adds numbers with +. String concatenation uses + too, but here a and b are integers." },
+
+  { topic:"String Task", q:"What does this print?",
+    code:"name = 'Maya'\nprint('Hello, ' + name + '!')",
+    opts:["Hello, !","Hello, Maya","Hello, Maya!","Hello, name!"], ans:2,
+    exp:"The + operator joins strings. 'Hello, ' + 'Maya' + '!' = 'Hello, Maya!'" },
+
+  { topic:"For Loop Task", q:"How many times does this loop run?",
+    code:"for i in range(1, 6):\n    print(i)",
+    opts:["6 times","4 times","5 times","10 times"], ans:2,
+    exp:"range(1, 6) produces 1, 2, 3, 4, 5 — five values. The end value (6) is NOT included." },
+
+  { topic:"While Loop Task", q:"What is printed when this code runs?",
+    code:"count = 0\nwhile count < 3:\n    count += 1\nprint(count)",
+    opts:["0","2","4","3"], ans:3,
+    exp:"count starts at 0, adds 1 each loop: 0→1→2→3. When count = 3 the condition count < 3 is False, loop stops. Prints 3." },
+
+  { topic:"If/Else Task", q:"What does this print when score = 55?",
+    code:"score = 55\nif score >= 60:\n    print('Pass')\nelif score >= 40:\n    print('Nearly')\nelse:\n    print('Fail')",
+    opts:["Pass","Fail","Nearly","Nothing"], ans:2,
+    exp:"55 is not >= 60 so if is False. 55 IS >= 40 so elif runs. Output: Nearly" },
+
+  { topic:"List Task", q:"What does this print?",
+    code:"scores = [8, 3, 9, 5]\nprint(scores[2])",
+    opts:["3","8","5","9"], ans:3,
+    exp:"Index 0=8, index 1=3, index 2=9, index 3=5. scores[2] = 9" },
+
+  { topic:"Function Task", q:"What does this function return when called as area(4, 5)?",
+    code:"def area(width, height):\n    return width * height\n\nprint(area(4, 5))",
+    opts:["9","45","20","Error"], ans:2,
+    exp:"width=4, height=5. width * height = 4 * 5 = 20. The function returns 20 which is then printed." },
+
+  { topic:"f-string Task", q:"What does this print?",
+    code:"name = 'Sam'\nage = 13\nprint(f'My name is {name} and I am {age}.')",
+    opts:["My name is {name} and I am {age}.","f'My name is Sam...'","My name is Sam and I am 13.","Error"], ans:2,
+    exp:"f-strings (f'...') embed variable values using {}. Output: My name is Sam and I am 13." },
+
+  { topic:"List + Loop Task", q:"What is the value of total at the end?",
+    code:"nums = [2, 4, 6, 8]\ntotal = 0\nfor n in nums:\n    total += n\nprint(total)",
+    opts:["20","2468","0","20"], ans:3,
+    exp:"total = 0+2+4+6+8 = 20. += adds each number to the running total. Output: 20" },
+
+  { topic:"Modulus Task", q:"What does this print?",
+    code:"number = 17\nif number % 2 == 0:\n    print('Even')\nelse:\n    print('Odd')",
+    opts:["Even","0","1","Odd"], ans:3,
+    exp:"% is the modulus (remainder) operator. 17 % 2 = 1 (remainder), not 0. So the else runs and prints Odd." },
 ];
 
 // ═══════════════════════════════════════════════════════════════
-// JAVASCRIPT CHALLENGES (20 tasks)
+// PYTHON CHALLENGES PART B (20 tasks)
 // ═══════════════════════════════════════════════════════════════
 const JS_CHALLENGES = [
-  { topic:"Variables", q:"What is the output?", code:"let x = 5;\nconst y = 3;\nconsole.log(x + y);", opts:["53","8","xy","Error"], ans:1, exp:"let and const declare variables. x + y = 5 + 3 = 8. console.log() prints to the console." },
-  { topic:"Data Types", q:"What does typeof 42 return?", code:"console.log(typeof 42);", opts:["int","integer","num","number"], ans:3, exp:"typeof returns a string. For numbers it returns 'number' — JavaScript has one numeric type for both integers and decimals." },
-  { topic:"String Methods", q:"What is the output?", code:"let word = 'javascript';\nconsole.log(word.toUpperCase());", opts:["javascript","JAVASCRIPT","Javascript","Error"], ans:1, exp:".toUpperCase() converts all characters to uppercase. Similar to Python's .upper()." },
-  { topic:"Arrays", q:"What is the output?", code:"let colours = ['red', 'green', 'blue'];\nconsole.log(colours[2]);", opts:["green","red","undefined","blue"], ans:3, exp:"Arrays are zero-indexed. Index 0=red, 1=green, 2=blue. colours[2] = 'blue'." },
-  { topic:"Array Methods", q:"What does this print?", code:"let nums = [1, 2, 3];\nnums.push(4);\nconsole.log(nums.length);", opts:["3","4","1","Error"], ans:1, exp:"push() adds an item to the end. The array is now [1,2,3,4] with length 4." },
-  { topic:"Functions", q:"What is the output?", code:"function multiply(a, b) {\n  return a * b;\n}\nconsole.log(multiply(4, 5));", opts:["45","9","20","Error"], ans:2, exp:"The function returns a * b. multiply(4, 5) = 4 * 5 = 20." },
-  { topic:"Arrow Functions", q:"What does this do?", code:"const double = n => n * 2;\nconsole.log(double(7));", opts:["7","2","72","14"], ans:3, exp:"Arrow functions (=>) are a concise syntax. double(7) = 7 * 2 = 14." },
-  { topic:"Conditions", q:"What is printed?", code:"let score = 55;\nif (score >= 60) {\n  console.log('Pass');\n} else {\n  console.log('Fail');\n}", opts:["Pass","Fail","55","Nothing"], ans:1, exp:"55 is not >= 60, so the else block runs and prints 'Fail'." },
-  { topic:"Loops", q:"What is the output?", code:"let total = 0;\nfor (let i = 1; i <= 4; i++) {\n  total += i;\n}\nconsole.log(total);", opts:["4","5","10","15"], ans:2, exp:"total = 0+1+2+3+4 = 10. The loop runs for i = 1, 2, 3, 4." },
-  { topic:"Equality", q:"What is the output?", code:"console.log(5 == '5');\nconsole.log(5 === '5');", opts:["true true","false false","true false","false true"], ans:2, exp:"== checks value only (type coercion), so 5 == '5' is true. === checks value AND type, so 5 === '5' is false." },
-  { topic:"Template Literals", q:"What is the output?", code:"let name = 'Zia';\nlet age = 14;\nconsole.log(`Hello ${name}, you are ${age}.`);", opts:["`Hello ${name}...`","Hello Zia, you are 14.","Error","Hello , you are ."], ans:1, exp:"Template literals use backticks and ${} to embed variables — similar to Python's f-strings." },
-  { topic:"Objects", q:"What does this print?", code:"let car = {make: 'Ford', year: 2022};\nconsole.log(car.make);", opts:["Ford","2022","car","Object"], ans:0, exp:"Objects store key-value pairs. car.make accesses the value for the 'make' key = 'Ford'." },
-  { topic:"Array Methods", q:"What does .map() do?", code:"let nums = [1, 2, 3];\nlet doubled = nums.map(n => n * 2);\nconsole.log(doubled);", opts:["[1,2,3]","[2,4,6]","6","Error"], ans:1, exp:".map() creates a NEW array by applying a function to each element. 1*2=2, 2*2=4, 3*2=6." },
-  { topic:"Undefined vs Null", q:"What is the output?", code:"let x;\nconsole.log(typeof x);", opts:["null","empty","none","undefined"], ans:3, exp:"A declared but unassigned variable has the value undefined. typeof undefined = 'undefined'." },
-  { topic:"String Concatenation", q:"What is the output?", code:"let a = '10';\nlet b = 5;\nconsole.log(a + b);", opts:["15","105","Error","'10'5"], ans:1, exp:"When you + a string and a number, JS converts the number to a string. '10' + 5 = '105'." },
-  { topic:"Boolean Logic", q:"What is the output?", code:"console.log(true && false);\nconsole.log(true || false);", opts:["true true","false false","true false","false true"], ans:3, exp:"&& (AND) = both must be true. true && false = false. || (OR) = either can be true. true || false = true." },
-  { topic:"DOM Manipulation", q:"What does document.getElementById() do?", code:"let btn = document.getElementById('myBtn');\nbtn.textContent = 'Clicked!';", opts:["Deletes the element","Creates a new element","Finds an HTML element by its id attribute","Adds a CSS class"], ans:2, exp:"getElementById() finds the HTML element with that id. You can then change its content, style or add events." },
-  { topic:"Event Listeners", q:"What does addEventListener do?", code:"btn.addEventListener('click', function() {\n  console.log('Button clicked!');\n});", opts:["Removes a button","Waits for a click and then runs the function","Adds a button to the page","Logs all events"], ans:1, exp:"addEventListener attaches a function (handler) that runs when the named event (e.g. 'click') occurs." },
-  { topic:"Scope", q:"What is the output?", code:"let x = 10;\nfunction show() {\n  let x = 20;\n  console.log(x);\n}\nshow();\nconsole.log(x);", opts:["20 10","10 20","20 20","10 10"], ans:0, exp:"The x inside the function is local (block scoped). It doesn't affect the outer x = 10. Output: 20 then 10." },
-  { topic:"Error Handling", q:"What keyword is used to handle errors in JavaScript?", code:"try {\n  let x = undeclaredVar;\n} catch (error) {\n  console.log('Error caught!');\n}", opts:["except","handle","catch","error"], ans:2, exp:"JavaScript uses try/catch. The catch block runs if an error is thrown in the try block." },
+
+  // ── MORE PYTHON THEORY ─────────────────────────────────────────────
+  { topic:"Scope", q:"What is the difference between a local and a global variable?",
+    opts:["They are the same","A local variable exists only inside a function; a global variable is accessible everywhere","Global variables are faster","Local variables are always integers"], ans:1,
+    exp:"Variables defined inside a function are local — they disappear when the function ends. Global variables are defined outside functions." },
+
+  { topic:"Dictionaries", q:"What is a Python dictionary?",
+    opts:["A sorted list","A collection of key-value pairs","A type of loop","A function that returns text"], ans:1,
+    exp:"Dictionaries store data as key-value pairs. Example: student = {'name': 'Ali', 'age': 15}. Access with student['name']" },
+
+  { topic:"Dictionaries Task", q:"What does this print?",
+    code:"student = {'name': 'Lexi', 'score': 92}\nprint(student['score'])",
+    opts:["Lexi","student","92","Error"], ans:2,
+    exp:"student['score'] accesses the value stored at the key 'score' which is 92." },
+
+  { topic:"Nested Loops", q:"How many times is 'Hi' printed?",
+    code:"for i in range(3):\n    for j in range(2):\n        print('Hi')",
+    opts:["5","3","2","6"], ans:3,
+    exp:"Outer loop: 3 times. Inner loop: 2 times each. 3 × 2 = 6 total prints of 'Hi'." },
+
+  { topic:"String Slicing", q:"What does this print?",
+    code:"word = 'PYTHON'\nprint(word[0:3])",
+    opts:["PYTH","PYT","YTH","Error"], ans:1,
+    exp:"Slicing [0:3] returns characters at index 0, 1, 2. P=0, Y=1, T=2, H=3. [0:3] = PYT (stop index is excluded)." },
+
+  { topic:"Exception Handling", q:"What is the purpose of try and except in Python?",
+    opts:["To speed up code","To create functions","To catch and handle errors gracefully instead of crashing","To import modules"], ans:2,
+    exp:"try/except prevents crashes. Code in try runs normally; if an error occurs, except handles it. Example: try: x=int(input()) except ValueError: print('Not a number!')" },
+
+  { topic:"Exception Task", q:"What prints when this runs and the user types 'hello'?",
+    code:"try:\n    x = int(input('Enter: '))\n    print(x * 2)\nexcept ValueError:\n    print('Invalid number!')",
+    opts:["hello * 2","0","hellohello","Invalid number!"], ans:3,
+    exp:"int('hello') causes a ValueError since 'hello' cannot be converted to integer. The except block catches it and prints 'Invalid number!'" },
+
+  { topic:"List Comprehension", q:"What does this produce?",
+    code:"squares = [x**2 for x in range(1, 5)]\nprint(squares)",
+    opts:["[1, 2, 3, 4]","[2, 4, 6, 8]","[1, 4, 9, 16, 25]","[1, 4, 9, 16]"], ans:3,
+    exp:"range(1,5) gives 1,2,3,4. Squaring each: 1²=1, 2²=4, 3²=9, 4²=16. Result: [1, 4, 9, 16]" },
+
+  { topic:"Classes", q:"What does __init__ do in a Python class?",
+    code:"class Dog:\n    def __init__(self, name):\n        self.name = name",
+    opts:["Deletes the object","Prints the class name","Initialises a new object — runs automatically when one is created","Returns the dog's name"], ans:2,
+    exp:"__init__ is the constructor. It runs automatically when you do: my_dog = Dog('Rex'). self.name = name stores the name on the object." },
+
+  { topic:"Classes Task", q:"What does this print?",
+    code:"class Cat:\n    def __init__(self, name):\n        self.name = name\n    def speak(self):\n        return self.name + ' says meow!'\n\nc = Cat('Whiskers')\nprint(c.speak())",
+    opts:["Cat says meow!","Whiskers","meow!","Whiskers says meow!"], ans:3,
+    exp:"Cat('Whiskers') creates a Cat with name='Whiskers'. c.speak() returns 'Whiskers' + ' says meow!' = 'Whiskers says meow!'" },
+
+  { topic:"File Handling", q:"What does this code do?",
+    code:"with open('scores.txt', 'w') as f:\n    f.write('Alice: 95')",
+    opts:["Reads from scores.txt","Creates scores.txt and writes 'Alice: 95' into it","Deletes scores.txt","Prints Alice: 95 to screen"], ans:1,
+    exp:"'w' mode opens for writing (creates file if it doesn't exist). f.write() writes the string to the file. 'with' ensures it closes automatically." },
+
+  { topic:"Recursion", q:"What does this return when called as countdown(3)?",
+    code:"def countdown(n):\n    if n == 0:\n        return 'Go!'\n    return str(n) + '... ' + countdown(n-1)",
+    opts:["Go!","3... 2... 1...","3... 2... 1... Go!","Error"], ans:2,
+    exp:"countdown(3) = '3... ' + countdown(2) = '3... 2... ' + countdown(1) = '3... 2... 1... ' + countdown(0) = '3... 2... 1... Go!'" },
+
+  { topic:"Sorting Task", q:"What does this print?",
+    code:"nums = [5, 2, 8, 1, 9]\nnums.sort()\nprint(nums)",
+    opts:["[5, 2, 8, 1, 9]","[9, 8, 5, 2, 1]","[1, 2, 5, 8, 9]","Error"], ans:2,
+    exp:".sort() sorts a list in ascending order (smallest to largest). The original list is modified in place." },
+
+  { topic:"String Methods Task", q:"What does this print?",
+    code:"sentence = 'hello world'\nwords = sentence.split()\nprint(len(words))",
+    opts:["11","1","2","hello"], ans:2,
+    exp:".split() splits a string by spaces into a list: ['hello', 'world']. len() of that list = 2." },
+
+  { topic:"Boolean Task", q:"What does this print?",
+    code:"x = 8\nresult = x > 5 and x < 10\nprint(result)",
+    opts:["8","and","False","True"], ans:3,
+    exp:"x > 5 is True (8 > 5). x < 10 is True (8 < 10). True AND True = True. Python boolean operators: and, or, not." },
+
+  { topic:"Format Task", q:"Which line correctly asks for a number and stores it as an integer?",
+    opts:["age = input('Age: ')","age = int(input('Age: '))","age = integer(input('Age: '))","age = number(input('Age: '))"], ans:1,
+    exp:"input() returns a string. Wrap with int() to convert: age = int(input('Age: ')). This is essential for arithmetic — you can't add strings and numbers." },
+
+  { topic:"Range Task", q:"What does range(0, 10, 2) produce?",
+    opts:["0 1 2 3 4 5 6 7 8 9 10","2 4 6 8 10","0 2 4 6 8","0 2 4 6 8 10"], ans:2,
+    exp:"range(start, stop, step). range(0,10,2) counts from 0 up to (not including) 10 in steps of 2: 0, 2, 4, 6, 8." },
+
+  { topic:"List Methods Task", q:"What does this print?",
+    code:"items = ['pen', 'pencil', 'ruler']\nitems.remove('pencil')\nprint(items)",
+    opts:["['pen', 'pencil', 'ruler']","['pencil']","['pen', 'ruler']","Error"], ans:2,
+    exp:".remove() finds and deletes the first occurrence of that value. Result: ['pen', 'ruler']" },
+
+  { topic:"Enumerate Task", q:"What does enumerate() do in this loop?",
+    code:"fruits = ['apple', 'banana', 'cherry']\nfor i, fruit in enumerate(fruits):\n    print(i, fruit)",
+    opts:["Sorts the list","Provides both the index and the value in each iteration","Counts the total items","Reverses the list"], ans:1,
+    exp:"enumerate() gives you index+value pairs. Output: 0 apple / 1 banana / 2 cherry. Useful when you need both position and value." },
+
+  { topic:"Comprehension Task", q:"What does this list comprehension create?",
+    code:"evens = [x for x in range(10) if x % 2 == 0]\nprint(evens)",
+    opts:["[1,3,5,7,9]","[0,2,4,6,8,10]","[0,2,4,6,8]","[2,4,6,8]"], ans:2,
+    exp:"range(10) = 0-9. The if x % 2 == 0 filter keeps only even numbers: 0,2,4,6,8." },
 ];
 
 // Fisher-Yates shuffle
@@ -650,9 +864,16 @@ function checkName() {
 let currentFilter=store.get('ks3_y9_filter')||'none';
 let isLight=store.get('ks3_y9_light')==='1';
 
+let isSuperpower = store.get('ks3_y9_super') === '1';
+
 function applyAll(){
-  document.body.classList.toggle('light',isLight);
-  document.getElementById('btn-light').classList.toggle('active-light',isLight);
+  document.body.classList.toggle('light', isLight);
+  document.body.classList.toggle('dyslexia', isSuperpower);
+  document.getElementById('btn-light').classList.toggle('active-light', isLight);
+  // Superpower button
+  const sb = document.getElementById('btn-super');
+  if(sb) sb.classList.toggle('active-super', isSuperpower);
+  if(sb) sb.textContent = isSuperpower ? '⚡ SUPERPOWER ON' : '⚡ SUPERPOWER';
   document.body.classList.remove('filter-blue','filter-green');
   document.getElementById('btn-blue').classList.remove('active-blue');
   document.getElementById('btn-green').classList.remove('active-green');
@@ -661,6 +882,11 @@ function applyAll(){
 }
 function toggleLight(){isLight=!isLight;store.set('ks3_y9_light',isLight?'1':'0');applyAll();}
 function toggleFilter(f){currentFilter=currentFilter===f?'none':f;store.set('ks3_y9_filter',currentFilter);applyAll();}
+function toggleSuperpower(){
+  isSuperpower=!isSuperpower;
+  store.set('ks3_y9_super',isSuperpower?'1':'0');
+  applyAll();
+}
 applyAll();
 
 // ═══════════════════════════════════════════════════════════════
@@ -949,7 +1175,7 @@ function renderChallenge(lang){
   document.getElementById(p+'-bar').style.width=((st.cur/10)*100)+'%';
 
   // Topic badge
-  const badge=lang==='python'?'<span class="lang-badge py">PYTHON</span>':'<span class="lang-badge js">JAVASCRIPT</span>';
+  const badge='<span class="lang-badge py">PYTHON</span>';
   document.getElementById(p+'-topic').innerHTML=badge+q.topic;
 
   document.getElementById(p+'-question').textContent=q.q;
@@ -958,16 +1184,58 @@ function renderChallenge(lang){
   const codeEl=document.getElementById(p+'-code');
   if(q.code){
     codeEl.style.display='block';
-    // Simple syntax highlight
-    let highlighted=q.code
-      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-      .replace(/(#.*)$/gm,'<span class="cm">$1</span>')
-      .replace(/\/\/.*/g,'<span class="cm">$&</span>')
-      .replace(/\b(def|return|for|while|if|elif|else|in|not|and|or|import|from|class|try|except|with|as|pass|break|continue|let|const|var|function|=&gt;|new|typeof|true|false|null|undefined|True|False|None)\b/g,'<span class="kw">$1</span>')
-      .replace(/\b(print|input|range|len|int|str|float|append|console\.log|document|getElementById|addEventListener)\b/g,'<span class="fn">$1</span>')
-      .replace(/'([^']*)'/g,"<span class='st'>'$1'</span>")
-      .replace(/"([^"]*)"/g,'<span class="st">"$1"</span>')
-      .replace(/\b(\d+)\b/g,'<span class="nm">$1</span>');
+    // Syntax highlight — safe order: escape, then tokenise line by line
+    const PY_KW  = /\b(def|return|for|while|if|elif|else|in|not|and|or|import|from|class|try|except|with|as|pass|break|continue|True|False|None)\b/g;
+    const PY_FN  = /\b(print|input|range|len|int|str|float|list|dict|append|remove|sort|split|join|type|enumerate|zip|map|filter|open|super|self)\b/g;
+    const PY_NUM = /(?<![\w"'])(\d+(?:\.\d+)?)(?![\w"'])/g;
+    const PY_STR_SQ = /'([^'\n]*)'/g;
+    const PY_STR_DQ = /"([^"\n]*)"/g;
+    const PY_CMT    = /(#[^\n]*)/g;
+
+    function hlLine(line) {
+      // Escape HTML first
+      line = line.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      // Use placeholder tokens to protect already-highlighted regions
+      const parts = [];
+      // Find strings and comments — protect them from keyword replacement
+      let result = '';
+      let i = 0;
+      while (i < line.length) {
+        // Single-quoted string
+        if (line[i] === "'" && line[i-1] !== '\\') {
+          let end = line.indexOf("'", i+1);
+          if (end === -1) end = line.length - 1;
+          parts.push('<span class="st">' + "'" + line.slice(i+1, end+1) + '</span>');
+          result += '\x00' + (parts.length-1) + '\x00';
+          i = end + 1; continue;
+        }
+        // Double-quoted string
+        if (line[i] === '"' && line[i-1] !== '\\') {
+          let end = line.indexOf('"', i+1);
+          if (end === -1) end = line.length - 1;
+          parts.push('<span class="st">' + '"' + line.slice(i+1, end+1) + '</span>');
+          result += '\x00' + (parts.length-1) + '\x00';
+          i = end + 1; continue;
+        }
+        // Comment
+        if (line[i] === '#') {
+          parts.push('<span class="cm">' + line.slice(i) + '</span>');
+          result += '\x00' + (parts.length-1) + '\x00';
+          break;
+        }
+        result += line[i]; i++;
+      }
+      // Now highlight keywords and functions on the unprotected code
+      result = result
+        .replace(PY_KW,  '<span class="kw">$1</span>')
+        .replace(PY_FN,  '<span class="fn">$1</span>')
+        .replace(PY_NUM, '<span class="nm">$1</span>');
+      // Restore protected parts
+      parts.forEach((p,idx) => { result = result.replace('\x00'+idx+'\x00', p); });
+      return result;
+    }
+
+    const highlighted = q.code.split('\n').map(hlLine).join('\n');
     codeEl.innerHTML=highlighted;
   }else{
     codeEl.style.display='none';
@@ -1016,7 +1284,7 @@ function showChEnd(lang){
   document.getElementById(p+'-final-score').textContent=st.score+'/10';
   document.getElementById(p+'-final-msg').textContent=
     pct===100?'🏆 PERFECT! Outstanding!':pct>=80?'🌟 Excellent work!':pct>=60?'✅ Good effort!':pct>=40?'📚 Keep going!':'💪 Keep practising!';
-  const gameName=lang==='python'?'Python Challenge':'JS Challenge';
+  const gameName=lang==='python'?'Python Part A':'Python Part B';
   saveScore({name:playerName||'Player',game:gameName,score:st.score*10,detail:`${st.score}/10 correct`});
 }
 
