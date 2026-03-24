@@ -1184,59 +1184,62 @@ function renderChallenge(lang){
   const codeEl=document.getElementById(p+'-code');
   if(q.code){
     codeEl.style.display='block';
-    // Syntax highlight — safe order: escape, then tokenise line by line
-    const PY_KW  = /\b(def|return|for|while|if|elif|else|in|not|and|or|import|from|class|try|except|with|as|pass|break|continue|True|False|None)\b/g;
-    const PY_FN  = /\b(print|input|range|len|int|str|float|list|dict|append|remove|sort|split|join|type|enumerate|zip|map|filter|open|super|self)\b/g;
-    const PY_NUM = /(?<![\w"'])(\d+(?:\.\d+)?)(?![\w"'])/g;
-    const PY_STR_SQ = /'([^'\n]*)'/g;
-    const PY_STR_DQ = /"([^"\n]*)"/g;
-    const PY_CMT    = /(#[^\n]*)/g;
+    // Syntax highlight — safe tokeniser using unicode private-use placeholders
+    const _KW = /\b(def|return|for|while|if|elif|else|in|not|and|or|import|from|class|try|except|with|as|pass|break|continue|True|False|None)\b/g;
+    const _FN = /\b(print|input|range|len|int|str|float|list|dict|append|remove|sort|split|join|type|enumerate|zip|map|filter|open|super|self)\b/g;
+    const _NM = /(?<![\w])(\d+(?:\.\d+)?)(?![\w])/g;
+    const _PH = '\uE010\uE011\uE012\uE013\uE014\uE015\uE016\uE017\uE018\uE019\uE01A\uE01B\uE01C\uE01D\uE01E\uE01F';
 
-    function hlLine(line) {
-      // Escape HTML first
-      line = line.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-      // Use placeholder tokens to protect already-highlighted regions
-      const parts = [];
-      // Find strings and comments — protect them from keyword replacement
-      let result = '';
-      let i = 0;
+    function hlLine(raw) {
+      let line = raw.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      const saved = []; // [placeholder_char, html_string, ...]
+      let out = '', i = 0;
       while (i < line.length) {
+        // Comment
+        if (line[i]==='#') {
+          const ph = _PH[saved.length/2 % _PH.length];
+          saved.push(ph, '<span class="cm">'+line.slice(i)+'</span>');
+          out += ph; break;
+        }
+        // f-string  f'...'
+        if (line[i]==='f' && line[i+1]==="'") {
+          let end = line.indexOf("'", i+2);
+          if (end===-1) end = line.length-1;
+          const ph = _PH[saved.length/2 % _PH.length];
+          saved.push(ph, '<span class="st">f'+line.slice(i+1,end+1)+'</span>');
+          out += ph; i = end+1; continue;
+        }
         // Single-quoted string
-        if (line[i] === "'" && line[i-1] !== '\\') {
+        if (line[i]==="'") {
           let end = line.indexOf("'", i+1);
-          if (end === -1) end = line.length - 1;
-          parts.push('<span class="st">' + "'" + line.slice(i+1, end+1) + '</span>');
-          result += '\x00' + (parts.length-1) + '\x00';
-          i = end + 1; continue;
+          if (end===-1) end = line.length-1;
+          const ph = _PH[saved.length/2 % _PH.length];
+          saved.push(ph, '<span class="st">'+line.slice(i,end+1)+'</span>');
+          out += ph; i = end+1; continue;
         }
         // Double-quoted string
-        if (line[i] === '"' && line[i-1] !== '\\') {
+        if (line[i]==='"') {
           let end = line.indexOf('"', i+1);
-          if (end === -1) end = line.length - 1;
-          parts.push('<span class="st">' + '"' + line.slice(i+1, end+1) + '</span>');
-          result += '\x00' + (parts.length-1) + '\x00';
-          i = end + 1; continue;
+          if (end===-1) end = line.length-1;
+          const ph = _PH[saved.length/2 % _PH.length];
+          saved.push(ph, '<span class="st">'+line.slice(i,end+1)+'</span>');
+          out += ph; i = end+1; continue;
         }
-        // Comment
-        if (line[i] === '#') {
-          parts.push('<span class="cm">' + line.slice(i) + '</span>');
-          result += '\x00' + (parts.length-1) + '\x00';
-          break;
-        }
-        result += line[i]; i++;
+        out += line[i]; i++;
       }
-      // Now highlight keywords and functions on the unprotected code
-      result = result
-        .replace(PY_KW,  '<span class="kw">$1</span>')
-        .replace(PY_FN,  '<span class="fn">$1</span>')
-        .replace(PY_NUM, '<span class="nm">$1</span>');
-      // Restore protected parts
-      parts.forEach((p,idx) => { result = result.replace('\x00'+idx+'\x00', p); });
-      return result;
+      // Apply keyword/function/number highlighting to non-string code
+      out = out.replace(_KW,'<span class="kw">$1</span>')
+               .replace(_FN,'<span class="fn">$1</span>')
+               .replace(_NM,'<span class="nm">$1</span>');
+      // Restore saved strings and comments
+      for (let n=0; n<saved.length; n+=2) out = out.split(saved[n]).join(saved[n+1]);
+      // Safety: remove any leftover placeholder chars
+      out = out.replace(/[\uE010-\uE01F]/g, '');
+      return out;
     }
 
     const highlighted = q.code.split('\n').map(hlLine).join('\n');
-    codeEl.innerHTML=highlighted;
+    codeEl.innerHTML = highlighted;
   }else{
     codeEl.style.display='none';
   }
@@ -1266,7 +1269,7 @@ function chAnswer(lang,idx,ans,q){
   document.getElementById(p+'-score').textContent=st.score;
   document.getElementById(p+'-streak').textContent=st.streak;
   const exp=document.getElementById(p+'-explanation');
-  exp.textContent='💡 '+q.exp;exp.style.display='block';
+  exp.innerHTML='💡 '+q.exp.replace(/\n/g,'<br>');exp.style.display='block';
   document.getElementById(p+'-next-btn').style.display='block';
 }
 
